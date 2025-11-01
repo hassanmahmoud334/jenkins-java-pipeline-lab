@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // Get current build number
+                    def buildNum = currentBuild.number
+                    echo "Build Number: ${buildNum}"
+
+                    // Check if build number > 5
+                    if (buildNum > 5) {
+                        error("Build number greater than 5! Stopping pipeline.")
+                    }
+
+                    // Build Java project with Maven
+                    sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when { branch 'main' } // deploy only on main branch
+            steps {
+                echo '🚀 Deploying application...'
+                sh 'echo "Deployed!"' // replace with real deploy command
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🎉 Build succeeded!'
+        }
+        failure {
+            echo '❌ Build failed!'
+        }
+    }
+}
