@@ -1,3 +1,5 @@
+@Library('my-shared-lib') _
+
 node {
     try {
         stage('Checkout') {
@@ -7,18 +9,20 @@ node {
         stage('Build') {
             def buildNum = env.BUILD_NUMBER.toInteger()
             echo "Build Number: ${buildNum}"
-
             if (buildNum > 5) {
                 error("Build number greater than 5! Stopping pipeline.")
             }
 
             sh 'mvn clean package'
+
+            // Call shared library function
+            printMessage("Build completed for build #${buildNum}")
         }
 
         stage('Deploy') {
             if (env.BRANCH_NAME == 'main') {
                 echo "🚀 Deploying application..."
-                sh 'echo "Deployed!"'  
+                sh 'echo "Deployed!"'
             }
         }
 

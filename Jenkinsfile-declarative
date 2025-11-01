@@ -1,37 +1,38 @@
+@Library('my-shared-lib') _
+
 pipeline {
     agent any
 
     stages {
         stage('Build') {
             steps {
+                checkout scm
                 script {
                     def buildNum = currentBuild.number
                     echo "Build Number: ${buildNum}"
-
                     if (buildNum > 5) {
                         error("Build number greater than 5! Stopping pipeline.")
                     }
 
                     sh 'mvn clean package'
+                    
+                    // Call shared library function
+                    printMessage("Build completed for build #${buildNum}")
                 }
             }
         }
 
         stage('Deploy') {
-            when { branch 'main' } 
+            when { branch 'main' }
             steps {
                 echo '🚀 Deploying application...'
-                sh 'echo "Deployed!"' 
+                sh 'echo "Deployed!"'
             }
         }
     }
 
     post {
-        success {
-            echo '🎉 Build succeeded!'
-        }
-        failure {
-            echo '❌ Build failed!'
-        }
+        success { echo '🎉 Build succeeded!' }
+        failure { echo '❌ Build failed!' }
     }
 }
